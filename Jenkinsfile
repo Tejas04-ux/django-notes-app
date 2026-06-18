@@ -1,29 +1,45 @@
-@Library('Shared')_
+@Library("shared") _
 pipeline{
-    agent { label 'dev-server'}
+    
+    agent { label "Tejas"}
     
     stages{
-        stage("Code clone"){
+        
+        stage("Hello"){
             steps{
-                sh "whoami"
-            clone("https://github.com/LondheShubham153/django-notes-app.git","main")
+                script{
+                    hello()
+                }
             }
         }
-        stage("Code Build"){
+        
+        stage("Build"){
             steps{
-            dockerbuild("notes-app","latest")
-            }
+                sh "sudo rm -rf data"
+                script{
+                docker_build("notes-app", "latest","tejasachari04")    
+                }
+            }   
         }
-        stage("Push to DockerHub"){
+        stage("code"){
+    steps{
+        script{
+            git url: "https://github.com/Tejas04-ux/django-notes-app.git", branch: "main"
+        }
+    }
+}
+        stage("Push to dockerhub"){
             steps{
-                dockerpush("dockerHubCreds","notes-app","latest")
+                script{
+                    docker_push("notes-app", "latest", "tejasachari04")
+                }
             }
         }
         stage("Deploy"){
             steps{
-                deploy()
+                echo "This is deploying the code"
+                sh "docker compose up -d"
             }
         }
-        
-    }
+    } 
 }
